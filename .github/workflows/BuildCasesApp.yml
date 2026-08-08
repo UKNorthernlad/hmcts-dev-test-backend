@@ -1,0 +1,94 @@
+name: Build Cases app
+
+on:
+  workflow_dispatch: 
+  
+  pull_request:
+    branches:
+      - master
+      
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5.7.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v5.1.0
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build Spring Boot application
+        run: ./gradlew build --no-daemon
+
+      - name: Run tests
+        run: ./gradlew test --no-daemon
+
+      - name: Static Analysis - OWASP, Checkstyle etc.
+        #run: ./gradlew dependencyCheckAggregate -PPdependencyCheck.nvd.apiKey=YOUR_KEY
+        run: echo Simulating running "./gradlew dependencyCheckAggregate -PPdependencyCheck.nvd.apiKey=XXXXX as no valid key available"
+      
+      - name: Container image build
+        run: docker build -t cases-app:latest .
+
+      - name: Login to container registry
+        run: echo Dummy - see ci.yml for details of what would be run here.
+        #run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tag image for Docker Hub
+        run: docker tag cases-app:latest ${{ secrets.DOCKERHUB_USERNAME }}/cases-app:latest
+
+      - name: Push image to Docker Hub
+        run: echo Dummy - see ci.yml for details of what would be run here.
+        #run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/cases-app:latest
+        
+      - name: Container security analysis using Trivy from Aqua Security
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          exit-code: 1 # exit code when vulnerabilities were found
+          ignore-unfixed: false # ignore unfixed vulnerabilities
+          severity: CRITICAL      
+          #tf-vars: # path to terraform tfvars file
+          image-ref: cases-app:latest
+
+      - name: Install Terraform using official source and not 3rd party action.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg software-properties-common
+          wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+            sudo tee /etc/apt/sources.list.d/hashicorp.list
+          sudo apt-get update
+          sudo apt-get install -y terraform
+        
+      - name: Terraform init
+        run: |
+          cd terraform/environments/dev/
+          pwd
+          terraform init
+          
+      - name: Terraform fmt (check only) & validate - DEV
+        run: |
+          pwd
+          cd terraform/environments/dev/
+          pwd
+          terraform fmt -check
+          terraform validate
+          
