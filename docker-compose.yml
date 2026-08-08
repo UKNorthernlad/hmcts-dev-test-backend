@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  myapp:
+    image: springboot-app:latest
+    ports:
+      - "4000:4000"
+    volumes:
+      - /tmp/secrets/DB_PASSWORD:/secrets/db_password:ro
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: devtest
+      DB_OPTIONS:
+      DB_USER_NAME: admin
+      DB_PASSWORD:
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - appnet
+
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    volumes:
+      - /tmp/secrets/DB_PASSWORD:/secrets/db_password:ro
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD_FILE: /secrets/db_password
+      POSTGRES_DB: devtest
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d $(cat /secrets/db_password)"] # A return of 0 = "accepting connections" indicates success
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - appnet
+
+networks:
+  appnet:
+    driver: bridge

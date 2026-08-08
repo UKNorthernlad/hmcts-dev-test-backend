@@ -8,15 +8,16 @@ management:
   endpoint:
     health:
       show-details: "always"
-      # group:
-      #  readiness:
-      #   include: "db"
+      group:
+       readiness:
+        include: "db"
   endpoints:
     web:
       base-path: /
       exposure:
-        include: info # should we have more?
-
+        include: info,health # should we have more?
+        show-details: "always"
+        
 springdoc:
   packagesToScan: uk.gov.hmcts.reform.dev.controllers
   writer-with-order-by-keys: true
@@ -26,20 +27,20 @@ spring:
     import: "optional:configtree:/mnt/secrets/test/"
   application:
     name: Dev Test
-#  datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
-#    username: ${DB_USER_NAME}
-#    password: ${DB_PASSWORD}
-#    properties:
-#      charSet: UTF-8
-#    hikari:
-#      minimumIdle: 2
-#      maximumPoolSize: 10
-#      idleTimeout: 10000
-#      poolName: {to-be-defined}HikariCP
-#      maxLifetime: 7200000
-#      connectionTimeout: 30000
+  datasource:
+   driver-class-name: org.postgresql.Driver
+   url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_OPTIONS:}
+   username: ${DB_USER_NAME}
+   password: ${DB_PASSWORD}
+   properties:
+     charSet: UTF-8
+  #  hikari:
+  #    minimumIdle: 2
+  #    maximumPoolSize: 10
+  #    idleTimeout: 10000
+  #    poolName: {to-be-defined}HikariCP
+  #    maxLifetime: 7200000
+  #    connectionTimeout: 30000
 #  jpa:
 #    properties:
 #      hibernate:
@@ -47,3 +48,9 @@ spring:
 #          lob:
 #            # silence the 'wall-of-text' - unnecessary exception throw about blob types
 #            non_contextual_creation: true
+logging:
+  level:
+    org.springframework.boot.context.config: DEBUG
+    org.springframework.boot.context.properties: DEBUG
+
+
