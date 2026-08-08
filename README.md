@@ -60,7 +60,6 @@ In this next section you will review the supplied Dockerfile which is a set of i
    * The application runs as a dedicated user (not root).
    * It listens on port 4000 which will be accessible from your browser when the container is running.
 12. Build the image: `docker build -t springboot-app:latest .`, then run it: `docker run -d --name case-app -p 4000:4000 springboot-app:latest`.
-`.
   > Note that we are not passing in database connection information as we are just wanting to test the container and application works.
 13. Browse to *http://localhost:4000/health* and ensure you see the JSON response (it will say that connections are failing - but this is fine).
 14. `docker kill case-app && docker rm case-app` to remove the case-app container.
