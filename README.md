@@ -114,7 +114,7 @@ It is a matter of personal taste as to wether all steps exist in a single job or
 
 22. If you have permissions, you can run this workflow manually, however [View the "Build Cases app" CI/CD pipeline](https://github.com/UKNorthernlad/hmcts-dev-test-backend/actions/workflows/BuildCasesApp.yml) if you wish to look at previous runs or [Download a log of a previous run for a detailed inspection](https://github.com/UKNorthernlad/hmcts-dev-test-backend/blob/master/samplelogs/logs_84820525985.zip).
 
-      [![Build Cases app](https://github.com/UKNorthernlad/hmcts-dev-test-backend/actions/workflows/BuildCasesApp.yml/badge.svg)](https://github.com/UKNorthernlad/hmcts-dev-test-backend/actions/workflows/BuildCasesApp.yml/badge.svg)
+      [![Build Cases app](https://github.com/UKNorthernlad/hmcts-dev-test-backend/actions/workflows/BuildCasesApp.yml/badge.svg)](https://github.com/UKNorthernlad/hmcts-dev-test-backend/actions/workflows/BuildCasesApp.yml)
 
 #### Deployment using Terraform from GitHub Actions.
 As this application is indended to be deployed into a public cloud service, a Terraform template has been created. This targets Microsoft Azure and has the following key features:
